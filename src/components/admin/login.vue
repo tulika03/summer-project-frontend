@@ -39,7 +39,7 @@
               ></v-text-field>
             </v-form>
               <v-card-actions>
-                <v-btn color="primary" @ click="login">Login</v-btn>
+                <v-btn color="primary" @click="login">Login</v-btn>
               </v-card-actions>
                 </v-flex>
               </v-layout>
@@ -74,14 +74,15 @@
     },
     methods: {
       login: function () {
-        Axios.post('http://localhost:3002/admin/adminLogin', {
+        Axios.post('http://localhost:3002/admin/login', {
           admin_password: this.admin_password,
           admin_email: this.admin_email
         }).then(response => {
           Vue.localStorage.set('token', response.data.token)
           //  console.log(response.data.token)
           localStorage.getItem('token')
-          this.$router.push('/')
+         // this.$router.push('/')
+          console.log('You have logged in successfully...' + response)
         }).catch(error => {
           console.log('Error login')
           console.log(error)
