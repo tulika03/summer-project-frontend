@@ -36,7 +36,7 @@
         <td>{{ props.item.category_id }}</td>
         <td>{{ props.item.category_title }}</td>
         <td class="justify-left layout px-4">
-          <v-btn icon class="mx-0" @click="editItem(props.item.category_id)">
+          <v-btn icon class="mx-0" v-bind:to= "{name: 'adminEditCategory'}">
             <v-icon color="teal">edit</v-icon>
           </v-btn>
           <v-btn icon class="mx-0" @click="deleteItem(props.item)">
@@ -69,9 +69,10 @@
       headers: [
         {
           text: 'Category Id', value: 'category_id'},
-        {text: 'Category Title', value: 'calories'},
-        {text: 'Actions', value: 'category_title'}
+        {text: 'Category Title', value: 'category_title'},
+        {text: 'Actions', value: 'category_id'}
       ],
+      categories: [],
       editedIndex: 0,
       editedItem: {
         category_id: '',

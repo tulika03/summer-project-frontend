@@ -6,6 +6,9 @@ import addNewAdmin from '@/components/admin/addAdmin'
 import adminAddCategory from '@/components/admin/category/addCategory'
 import adminviewCategory from '@/components/admin/category/viewCategory'
 import adminEditCategory from '@/components/admin/category/editCategory'
+import adminAddEmployee from '@/components/admin/employee/addEmployee'
+import adminEditEmployee from '@/components/admin/employee/editEmployee'
+import adminViewEmployee from '@/components/admin/employee/viewEmployee'
 
 Vue.use(Router)
 
@@ -40,6 +43,21 @@ export default new Router({
       path: '/admin/category/editCategory/:_id',
       name: 'adminEditCategory',
       component: adminEditCategory
+    },
+    {
+      path: '/admin/employee/addEmployee',
+      name: 'adminAddEmployee',
+      component: adminAddEmployee
+    },
+    {
+      path: '/admin/employee/editEmployee',
+      name: 'adminEditEmployee',
+      component: adminEditEmployee
+    },
+    {
+      path: '/admin/employee/viewEmployee',
+      name: 'adminViewEmployee',
+      component: adminViewEmployee
     }
   ],
   mode: 'history'
