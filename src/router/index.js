@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import adminLogin from '@/components/admin/login'
+import addNewAdmin from '@/components/admin/addAdmin'
 import adminAddCategory from '@/components/admin/category/addCategory'
 import adminviewCategory from '@/components/admin/category/viewCategory'
 import adminEditCategory from '@/components/admin/category/editCategory'
@@ -21,6 +22,11 @@ export default new Router({
       component: adminLogin
     },
     {
+      path: '/admin/addAdmin',
+      name: 'addNewAdmin',
+      component: addNewAdmin
+    },
+    {
       path: '/admin/category/addCategory',
       name: 'adminAddCategory',
       component: adminAddCategory
@@ -31,7 +37,7 @@ export default new Router({
       component: adminviewCategory
     },
     {
-      path: '/admin/category/editCategory',
+      path: '/admin/category/editCategory/:_id',
       name: 'adminEditCategory',
       component: adminEditCategory
     }
