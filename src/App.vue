@@ -3,7 +3,8 @@
     <v-navigation-drawer
       fixed temporary
       :mini-variant="miniVariant"
-      v-model="drawer">
+      v-model="drawer"
+      :clipped="$vuetify.breakpoint.lgAndUp">
       <v-list>
         <v-list-tile
           value="true"
@@ -19,7 +20,7 @@
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
-    <v-toolbar app :clipped-left="clipped">
+    <v-toolbar app :clipped-left="clipped" color="primary">
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
       <v-btn icon @click.stop="miniVariant = !miniVariant">
         <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>

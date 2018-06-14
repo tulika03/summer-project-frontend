@@ -14,9 +14,11 @@ import {
   VGrid,
   VToolbar,
   transitions,
-  vForm,
-  vTextField,
-  vCard
+  VForm,
+  VTextField,
+  VCard,
+  VDataTable,
+  VDialog
 } from 'vuetify'
 import '../node_modules/vuetify/src/stylus/app.styl'
 
@@ -28,15 +30,17 @@ Vue.use(Vuetify, {
     VList,
     VBtn,
     VIcon,
-    vCard,
     VGrid,
     VToolbar,
     transitions,
-    vForm,
-    vTextField
+    VForm,
+    VTextField,
+    VCard,
+    VDataTable,
+    VDialog
   },
   theme: {
-    primary: '#ee44aa',
+    primary: '#78e5c7',
     secondary: '#424242',
     accent: '#82B1FF',
     error: '#FF5252',
