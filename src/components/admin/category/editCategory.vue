@@ -18,7 +18,7 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary"><Back></Back></v-btn>
+                <v-btn color="primary">Back</v-btn>
                 <v-btn color="primary">Edit</v-btn>
               </v-card-actions>
             </v-card>
