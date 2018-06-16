@@ -18,7 +18,10 @@ import {
   VTextField,
   VCard,
   VDataTable,
-  VDialog
+  VDialog,
+  VSubheader,
+  VSelect,
+  VTabs
 } from 'vuetify'
 import '../node_modules/vuetify/src/stylus/app.styl'
 
@@ -37,7 +40,10 @@ Vue.use(Vuetify, {
     VTextField,
     VCard,
     VDataTable,
-    VDialog
+    VDialog,
+    VSubheader,
+    VSelect,
+    VTabs
   },
   theme: {
     primary: '#78e5c7',

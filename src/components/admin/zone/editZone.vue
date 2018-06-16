@@ -2,18 +2,17 @@
   <v-app id="inspire">
     <v-content>
       <v-container fluid>
-        <v-layout row wrap>
-          <v-flex xs12 md6 offset-md3>
+        <v-layout align-center justify-center>
+          <v-flex xs12 sm8 md4>
             <v-card class="elevation-12">
               <v-toolbar dark color="primary">
-                <v-toolbar-title>Add Category</v-toolbar-title>
+                <v-toolbar-title>Update Zone detail</v-toolbar-title>
                 <v-spacer></v-spacer>
 
               </v-toolbar>
               <v-card-text>
                 <v-form>
-                  <v-text-field v-model="category_id" label="Category Id" type="text" required class="text--darken-1" :rule="idRules"></v-text-field>
-                  <v-text-field v-model="category_title"  label="Title" type="text" required :rules="titleRules"></v-text-field>
+                  <v-text-field v-model="zone_name"  label="Title" type="text" required :rules="titleRules"></v-text-field>
                 </v-form>
               </v-card-text>
               <v-card-actions>
@@ -36,33 +35,28 @@
     name: 'app',
     data () {
       return {
-        category_id: '',
-        category_title: '',
-        idRules: [
-          v => !!v || 'category Id is required'
-        ],
+        zone_name: '',
         titleRules: [
-          v => !!v || 'Title is required'
+          v => !!v || 'Zone name is required'
         ]
       }
     },
     computed: {
       formIsValid () {
-        return this.category_id !== '' && this.category_title !== ''
+        return this.zone_name !== ''
       }
     },
     methods: {
-      signup: function () {
-        console.log(this.category_id)
-        console.log(this.category_title)
-        axios.post('http: //localhost:3002/admin/category/addCategory', {
-          category_id: this.category_id,
-          category_title: this.category_title
+      update: function () {
+        console.log(this.zone_name)
+        axios.patch('http: //', {
+          zone_name: this.zone_name
         }).then(response => {
           console.log(response.data)
+          console.log('Zone updated successfully....')
           localStorage.getItem('token')
         }).catch(error => {
-          console.log('Error adding new category')
+          console.log('Error adding new zone')
           console.log(error)
           console.log(error.status)
           console.log(error.code)

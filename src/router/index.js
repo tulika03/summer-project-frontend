@@ -9,6 +9,13 @@ import adminEditCategory from '@/components/admin/category/editCategory'
 import adminAddEmployee from '@/components/admin/employee/addEmployee'
 import adminEditEmployee from '@/components/admin/employee/editEmployee'
 import adminViewEmployee from '@/components/admin/employee/viewEmployee'
+import adminAddZone from '@/components/admin/zone/addZone'
+import adminViewZone from '@/components/admin/zone/viewZone'
+import adminEditZone from '@/components/admin/zone/editZone'
+import adminAddChoice from '@/components/admin/choice/addChoice'
+import adminEditChoice from '@/components/admin/choice/editChoice'
+import adminViewChoice from '@/components/admin/choice/viewChoice'
+import adminChangeImage from '@/components/admin/choice/changeImage'
 
 Vue.use(Router)
 
@@ -58,6 +65,41 @@ export default new Router({
       path: '/admin/employee/viewEmployee',
       name: 'adminViewEmployee',
       component: adminViewEmployee
+    },
+    {
+      path: '/admin/zone/addZone',
+      name: 'adminAddZone',
+      component: adminAddZone
+    },
+    {
+      path: '/admin/zone/viewZone',
+      name: 'adminViewZone',
+      component: adminViewZone
+    },
+    {
+      path: '/admin/zone/editZone',
+      name: 'adminEditZone',
+      component: adminEditZone
+    },
+    {
+      path: '/admin/choice/addChoice',
+      name: 'adminAddChoice',
+      component: adminAddChoice
+    },
+    {
+      path: '/admin/choice/editChoice',
+      name: 'adminEditChoice',
+      component: adminEditChoice
+    },
+    {
+      path: '/admin/choice/viewChoice',
+      name: 'adminViewChoice',
+      component: adminViewChoice
+    },
+    {
+      path: '/admin/choice/changeImage',
+      name: 'adminChangeImage',
+      component: adminChangeImage
     }
   ],
   mode: 'history'
