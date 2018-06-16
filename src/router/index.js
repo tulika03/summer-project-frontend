@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
+// admin routes
 import adminLogin from '@/components/admin/login'
 import addNewAdmin from '@/components/admin/addAdmin'
 import adminAddCategory from '@/components/admin/category/addCategory'
