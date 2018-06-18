@@ -5,7 +5,7 @@
 
       <v-layout>
         <v-toolbar card prominent color="blue">
-          <v-toolbar-title class="white--text offset-sm4 ">Choice details</v-toolbar-title>
+          <v-toolbar-title class="white--text offset-sm4 ">Jobsites details</v-toolbar-title>
           <v-spacer></v-spacer>
         </v-toolbar>
       </v-layout>
@@ -26,14 +26,19 @@
             </v-card-title>
             <v-data-table
               :headers="headers"
-              :items="choices"
+              :items="items"
               :search="search"
               hide-actions
               class="elevation-1"
             >
 
               <template slot="items" slot-scope="props">
-                <td>{{ props.item.zone_name }}</td>
+                <td>{{ props.item.jobsite_name }}</td>
+                <td>{{ props.item.client_name }}</td>
+                <td>{{ props.item.client_address }}</td>
+                <td>{{ props.item.client_contact }}</td>
+                <td>{{ props.item.client_email }}</td>
+                <td>{{ props.item.zone_id }}</td>
                 <td class="justify-left layout px-4">
                   <v-btn icon class="mx-0" v-bind:to= "{name: 'adminEditZone'}">
                     <v-icon color="teal">edit</v-icon>
@@ -66,13 +71,12 @@
       dialog: false,
       search: '',
       headers: [
-        {text: 'Choice Code', value: 'choice_code'},
-        {text: 'choice name', value: 'choice_name'},
-        {text: 'Photo', value: 'choice_photo'},
-        {text: 'Description', value: 'choice_description'},
-        {text: 'File ', value: 'choice_file'},
-        {text: 'Status', value: 'choice_status'},
-        {text: 'Price', value: 'choice_unitCost'}
+        {text: 'Job site Name', value: 'jobsite_name'},
+        {text: 'Client name', value: 'client_name'},
+        {text: 'Address', value: 'client_address'},
+        {text: 'Contact No.', value: 'client_contact'},
+        {text: 'Email ', value: 'client_email'},
+        {text: 'Zones', value: 'zone_id'}
       ],
       zones: []
     }),
@@ -82,27 +86,15 @@
 
     methods: {
       initialize () {
-        this.zones = [
+        this.items = [
           {
-            choice_name: 'Frozen Yogurt'
+            jobsite_name: 'Frozen Yogurt'
           },
           {
-            choice_name: 'Ice cream sandwich'
+            jobsite_name: 'Ice cream sandwich'
           },
           {
-            choice_name: 'Eclair'
-          },
-          {
-            choice_name: 'Cupcake'
-          },
-          {
-            choice_name: 'Gingerbread'
-          },
-          {
-            choice_name: 'Jelly bean'
-          },
-          {
-            choice_name: 'Lollipop'
+            jobsite_name: 'Eclair'
           }
         ]
       },

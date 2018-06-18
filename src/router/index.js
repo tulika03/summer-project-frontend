@@ -17,6 +17,12 @@ import adminAddChoice from '@/components/admin/choice/addChoice'
 import adminEditChoice from '@/components/admin/choice/editChoice'
 import adminViewChoice from '@/components/admin/choice/viewChoice'
 import adminChangeImage from '@/components/admin/choice/changeImage'
+import adminAddItem from '@/components/admin/item/addItem'
+import adminEditItem from '@/components/admin/item/editItem'
+import adminViewItem from '@/components/admin/item/viewItemZone'
+import adminAddJobsite from '@/components/admin/jobsite/addJobsite'
+import adminEditJobsite from '@/components/admin/jobsite/editJobsite'
+import adminViewJobsite from '@/components/admin/jobsite/viewJobsite'
 
 Vue.use(Router)
 
@@ -101,6 +107,36 @@ export default new Router({
       path: '/admin/choice/changeImage',
       name: 'adminChangeImage',
       component: adminChangeImage
+    },
+    {
+      path: '/admin/item/addItem',
+      name: 'adminAddItem',
+      component: adminAddItem
+    },
+    {
+      path: '/admin/item/editItem',
+      name: 'adminEditItem',
+      component: adminEditItem
+    },
+    {
+      path: '/admin/item/viewItem',
+      name: 'adminViewItem',
+      component: adminViewItem
+    },
+    {
+      path: '/admin/jobsite/addJobSite',
+      name: 'adminAddJobsite',
+      component: adminAddJobsite
+    },
+    {
+      path: '/admin/jobsite/editJobSite',
+      name: 'adminEditJobsite',
+      component: adminEditJobsite
+    },
+    {
+      path: '/admin/jobsite/viewJobSite',
+      name: 'adminViewJobsite',
+      component: adminViewJobsite
     }
   ],
   mode: 'history'

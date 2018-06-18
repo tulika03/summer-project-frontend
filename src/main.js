@@ -21,7 +21,9 @@ import {
   VDialog,
   VSubheader,
   VSelect,
-  VTabs
+  VTabs,
+  VAvatar,
+  VExpansionPanel
 } from 'vuetify'
 import '../node_modules/vuetify/src/stylus/app.styl'
 
@@ -43,7 +45,9 @@ Vue.use(Vuetify, {
     VDialog,
     VSubheader,
     VSelect,
-    VTabs
+    VTabs,
+    VAvatar,
+    VExpansionPanel
   },
   theme: {
     primary: '#78e5c7',
