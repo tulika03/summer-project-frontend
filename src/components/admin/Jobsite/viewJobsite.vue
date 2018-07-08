@@ -99,10 +99,7 @@
         ]
       },
 
-      deleteItem (item) {
-        const index = this.categories.indexOf(item)
-        confirm('Are you sure you want to delete this item?') && this.categories.splice(index, 1)
-      }
+      deleteItem () {}
     }
   }
 </script>

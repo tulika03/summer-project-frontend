@@ -32,6 +32,18 @@
                 label="last name"
                 required
               ></v-text-field>
+              <br>
+              <v-flex xs12>
+                <label style="color: grey">Add Employee Image</label>
+                <br><br>
+              </v-flex>
+              <v-flex>  <input type=file
+                               @change="onFileSelected"
+                               class="text--primary"
+                               accept=""
+              ></v-flex>
+              <br>
+
               <v-text-field
                 v-model="employee_contact"
                 :rules="[() => employee_contact.length > 0 || 'This field is required']"
@@ -63,12 +75,12 @@
 
           <v-card-actions>
             <v-btn
-              :disabled="!valid"
-              @click="submit"
+              :disabled="!formIsValid"
+              @click="addEmployee"
             >
-              submit
+              Submit
             </v-btn>
-            <v-btn @click="clear">clear</v-btn>
+            <v-btn @click="clear">Clear</v-btn>
           </v-card-actions>
 
         </v-card>
@@ -80,8 +92,6 @@
 <script>
   import Axios from 'axios'
   import Vue from 'vue'
-  import VueLocalStorage from 'vue-localstorage'
-  Vue.use(VueLocalStorage)
   export default {
     data () {
       return {
@@ -90,6 +100,7 @@
         employee_Id: '',
         employee_firstName: '',
         employee_lastName: '',
+        employee_photo: '',
         employee_contact: '',
         employee_username: '',
         employee_email: '',
@@ -103,28 +114,49 @@
         ]
       }
     },
+    computed: {
+      formIsValid () {
+        return this.employee_Id !== '' &&
+          this.employee_firstName !== '' &&
+          this.employee_lastName !== '' &&
+          this.employee_photo !== '' &&
+          this.employee_contact !== '' &&
+          this.employee_username !== '' &&
+          this.employee_email !== '' &&
+          this.employee_password !== ''
+      }
+    },
     methods: {
-      submit: function () {
-        if (this.$refs.form.validate()) {
-          Axios.post('http://localhost:3002/admin/employee/addEmployee', {
-            employee_Id: this.employee_Id,
-            employee_firstName: this.employee_firstName,
-            employee_lastName: this.employee_lastName,
-            employee_contact: this.employee_contact,
-            employee_username: this.employee_username,
-            employee_email: this.employee_email,
-            employee_password: this.employee_password
-          }).then(response => {
-            Vue.localStorage.set('token', response.data.token)
-            //  console.log(response.data.token)
-            localStorage.getItem('token')
-            // this.$router.push('/')
-            console.log('You have enterd the details successfully...' + response)
-          }).catch(error => {
-            console.log('Error in adding employee details')
-            console.log(error)
-            this.$router.push('/admin/employee/addEmployee')
+      onFileSelected (event) {
+        this.employee_photo = event.target.files[0]
+        console.log(this.employee_photo)
+      },
+      addEmployee: function () {
+        console.log(Vue.localStorage.get('token'))
+        var jwt = Vue.localStorage.get('token')
+        if (jwt) {
+          const fd = new FormData()
+          fd.append('employee_photo', this.employee_photo)
+          fd.append('employee_Id', this.employee_Id)
+          fd.append('employee_firstName', this.employee_firstName)
+          fd.append('employee_lastName', this.employee_lastName)
+          fd.append('employee_contact', this.employee_contact)
+          fd.append('employee_username', this.employee_username)
+          fd.append('employee_email', this.employee_email)
+          fd.append('employee_password', this.employee_password)
+
+          Axios.post('http://localhost:3002/admin/employee/addEmployee', fd, {
+            headers: {
+              'Content-type': 'multipart/form-data',
+              'Authorization': 'bearer ' + Vue.localStorage.get('token')
+            }
+          }).then(r => {
+            console.log('r: ', JSON.stringify(r, null, 2))
+            window.alert('data inserted successfully.')
           })
+            .catch(error => {
+              console.log(error.response)
+            })
         }
       },
       clear () {

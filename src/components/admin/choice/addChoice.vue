@@ -95,9 +95,9 @@
                     </v-flex>
                     <v-flex xs6>
                       <v-select
-                        :items="category"
-                        v-model="category_select"
-                        :hint="`${category_select.category_title}, ${category_select.category_id}`"
+                        :items="categories"
+                        v-model="categories"
+                        :hint="`${categories.category_title}, ${categories.categoryId}`"
                         single-line
                         :rules="[v => !!v || 'category is required']"
                         item-text="category_title"
@@ -157,17 +157,12 @@
         choice_quantity: '',
         choice_unitCost: '',
         choice_costCode: '',
-        category_id: '',
+        categoryId: '',
         status_list: [
           {status_name: 'Pending'},
           {status_name: 'Complete'}
         ],
-        category: [
-          {category_title: 'aaa', category_id: '1'},
-          {category_title: 'bbb', category_id: '2'},
-          {category_title: 'ccc', category_id: '3'},
-          {category_title: 'ddd', category_id: '4'}
-        ],
+        categories: [],
         sideNav: false,
         right: null
       }
@@ -219,8 +214,27 @@
             })
           window.alert('data inserted successfully.')
         } else {
-          this.$router.push('/admin/')
+          this.$router.push('/admin/login')
         }
+      }
+    },
+    created () {
+      console.log(Vue.localStorage.get('token'))
+      var jwt = Vue.localStorage.get('token')
+      if (jwt) {
+        axios.get('http://localhost:3002/admin/category/viewCategory', {
+          headers: {
+            'Authorization': 'bearer ' + Vue.localStorage.get('token')
+          }
+        })
+          .then(response => {
+            this.categories = response.data
+          })
+          .catch(error => {
+            console.log(error)
+          })
+      } else {
+        this.$router.push('/admin/login')
       }
     }
   }

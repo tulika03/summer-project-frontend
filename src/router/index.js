@@ -10,6 +10,7 @@ import adminEditCategory from '@/components/admin/category/editCategory'
 import adminAddEmployee from '@/components/admin/employee/addEmployee'
 import adminEditEmployee from '@/components/admin/employee/editEmployee'
 import adminViewEmployee from '@/components/admin/employee/viewEmployee'
+import changeEmployeeImage from '@/components/admin/employee/changeEmployeeImage'
 import adminAddZone from '@/components/admin/zone/addZone'
 import adminViewZone from '@/components/admin/zone/viewZone'
 import adminEditZone from '@/components/admin/zone/editZone'
@@ -54,7 +55,7 @@ export default new Router({
       component: adminviewCategory
     },
     {
-      path: '/admin/category/editCategory/:_id',
+      path: '/admin/category/editCategory/:id',
       name: 'adminEditCategory',
       component: adminEditCategory
     },
@@ -64,9 +65,14 @@ export default new Router({
       component: adminAddEmployee
     },
     {
-      path: '/admin/employee/editEmployee',
+      path: '/admin/employee/editEmployee/:id',
       name: 'adminEditEmployee',
       component: adminEditEmployee
+    },
+    {
+      path: '/admin/employee/changeEmployeeImage/:id',
+      name: 'changeEmployeeImage',
+      component: changeEmployeeImage
     },
     {
       path: '/admin/employee/viewEmployee',
@@ -84,7 +90,7 @@ export default new Router({
       component: adminViewZone
     },
     {
-      path: '/admin/zone/editZone',
+      path: '/admin/zone/editZone/:id',
       name: 'adminEditZone',
       component: adminEditZone
     },

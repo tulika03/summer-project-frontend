@@ -13,12 +13,12 @@
               <v-card-text>
                 <v-form>
                   <v-text-field v-model="category_id" label="Category Id" type="text" required class="text--darken-1" :rule="idRules"></v-text-field>
-                  <v-text-field v-model="category_title"  label="Title" type="text" required :rules="titleRules"></v-text-field>
+                  <v-text-field v-model="category_name"  label="Title" type="text" required :rules="titleRules"></v-text-field>
                 </v-form>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary">Add</v-btn>
+                <v-btn color="primary" @click="add">Add</v-btn>
               </v-card-actions>
             </v-card>
           </v-flex>
@@ -30,14 +30,13 @@
 <script>
   import axios from 'axios'
   import Vue from 'vue'
-  import VueLocalStorage from 'vue-localstorage'
-  Vue.use(VueLocalStorage)
+
   export default {
     name: 'app',
     data () {
       return {
         category_id: '',
-        category_title: '',
+        category_name: '',
         idRules: [
           v => !!v || 'category Id is required'
         ],
@@ -48,25 +47,37 @@
     },
     computed: {
       formIsValid () {
-        return this.category_id !== '' && this.category_title !== ''
+        return this.category_id !== '' && this.category_name !== ''
       }
     },
     methods: {
-      signup: function () {
+      add: function () {
         console.log(this.category_id)
-        console.log(this.category_title)
-        axios.post('http: //localhost:3002/admin/category/addCategory', {
-          category_id: this.category_id,
-          category_title: this.category_title
-        }).then(response => {
-          console.log(response.data)
-          localStorage.getItem('token')
-        }).catch(error => {
-          console.log('Error adding new category')
-          console.log(error)
-          console.log(error.status)
-          console.log(error.code)
-        })
+        console.log(this.category_name)
+        console.log(Vue.localStorage.get('token'))
+        var jwt = Vue.localStorage.get('token')
+        if (jwt) {
+          axios.post('http://localhost:3002/admin/category/addCategory',
+            {
+              category_id: this.category_id,
+              category_name: this.category_name
+            },
+            {
+              headers: {
+                'Authorization': 'bearer ' + Vue.localStorage.get('token')
+              }
+            })
+            .then(r => {
+              console.log(r + 'data inserted successfully')
+              window.alert('Data inserted successfully...')
+            })
+            .catch(error => {
+              console.log(error.response)
+            })
+        } else {
+         // this.$router.push('/admin/login')
+          console.log('authentication not successful...')
+        }
       }
     }
   }

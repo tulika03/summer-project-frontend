@@ -23,7 +23,9 @@ import {
   VSelect,
   VTabs,
   VAvatar,
-  VExpansionPanel
+  VExpansionPanel,
+  VTooltip,
+  VAlert
 } from 'vuetify'
 import '../node_modules/vuetify/src/stylus/app.styl'
 
@@ -47,7 +49,9 @@ Vue.use(Vuetify, {
     VSelect,
     VTabs,
     VAvatar,
-    VExpansionPanel
+    VExpansionPanel,
+    VTooltip,
+    VAlert
   },
   theme: {
     primary: '#78e5c7',

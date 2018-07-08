@@ -7,46 +7,58 @@
           <v-toolbar color="indigo" dark>
             <v-toolbar-title>Update Employee Details</v-toolbar-title>
           </v-toolbar>
+
+          <v-card-media
+            :src="employees.employee_photo"
+            height="350px" width="400px"
+              >
+            <v-layout column class="media">
+                <v-spacer></v-spacer>
+                <v-btn fab v-bind:to="{name: 'changeEmployeeImage', params: {id: this.employees._id }}">
+                  <v-icon>edit</v-icon>
+                </v-btn>
+            </v-layout>
+          </v-card-media>
+
           <v-card-text>
-            <v-form ref="form" v-model="valid" lazy-validation>
+            <v-form ref="form" lazy-validation>
 
               <v-text-field
-                v-model="employee_Id"
-                :rules="[() => employee_Id.length > 0 || 'This field is required']"
+                v-model="employees.employee_Id"
+                :rules="[() => employees.employee_Id.length > 0 || 'This field is required']"
                 label="Id"
                 required
-              ></v-text-field>
+              >{{ employees.employee_Id }}</v-text-field>
               <v-text-field
-                v-model="employee_firstName"
-                :rules="[() => employee_firstName.length > 0 || 'This field is required']"
+                v-model="employees.employee_firstName"
+                :rules="[() => employees.employee_firstName.length > 0 || 'This field is required']"
                 label="first name"
                 required
-              ></v-text-field>
+              >{{ employees.employee_firstName }}</v-text-field>
 
               <v-text-field
-                v-model="employee_lastName"
-                :rules="[() => employee_lastName.length > 0 || 'This field is required']"
+                v-model="employees.employee_lastName"
+                :rules="[() =>employees.employee_lastName.length > 0 || 'This field is required']"
                 label="last name"
                 required
-              ></v-text-field>
+              >{{ employees.employee_lastName }}</v-text-field>
               <v-text-field
-                v-model="employee_contact"
-                :rules="[() => employee_contact.length > 0 || 'This field is required']"
+                v-model="employees.employee_contact"
                 label="Contact No."
                 required
-              ></v-text-field>
+              > {{ employees.employee_contact }}</v-text-field>
               <v-text-field
-                v-model="employee_username"
+                v-model="employees.employee_username"
                 label="Username"
-                :rules="[() => employee_username.length > 0 || 'This field is required']"
+                :rules="[() => employees.employee_username.length > 0 || 'This field is required']"
                 required
-              ></v-text-field>
+              >{{ employees.employee_username }}</v-text-field>
               <v-text-field
-                v-model="employee_email"
+                v-model="employees.employee_email"
                 label="email Id"
-                :rules='emailRules'
+                :rules='employees.emailRules'
                 required
-              ></v-text-field>
+              >{{ employees.employee_email }}</v-text-field>
               <small>*indicates required field</small>
             </v-form>
           </v-card-text>
@@ -54,7 +66,7 @@
           <v-card-actions>
             <v-btn
               :disabled="!valid"
-              @click="submit"
+              @click="edit"
             >
               submit
             </v-btn>
@@ -70,56 +82,83 @@
 <script>
   import Axios from 'axios'
   import Vue from 'vue'
-  import VueLocalStorage from 'vue-localstorage'
-  Vue.use(VueLocalStorage)
   export default {
     data () {
       return {
         e1: false,
         valid: true,
-        employee_Id: '',
-        employee_firstName: '',
-        employee_lastName: '',
-        employee_contact: '',
-        employee_username: '',
-        employee_email: '',
-        employee_password: '',
-        emailRules: [
-          v => !!v || 'E-mail is required',
-          v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
-        ],
-        passwordRules: [
-          v => !!v || 'Password is required'
-        ]
+        employees: {
+          employee_Id: '',
+          employee_firstName: '',
+          employee_lastName: '',
+          employee_photo: '',
+          employee_contact: '',
+          employee_username: '',
+          employee_email: '',
+          emailRules: [
+            v => !!v || 'E-mail is required',
+            v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
+          ],
+          passwordRules: [
+            v => !!v || 'Password is required'
+          ],
+          _id: ''
+        }
       }
     },
     methods: {
-      submit: function () {
-        if (this.$refs.form.validate()) {
-          Axios.patch('http://localhost:3002/admin/employee/editEmployee/:_id', {
-            employee_Id: this.employee_Id,
-            employee_firstName: this.employee_firstName,
-            employee_lastName: this.employee_lastName,
-            employee_contact: this.employee_contact,
-            employee_username: this.employee_username,
-            employee_email: this.employee_email,
-            employee_password: this.employee_password
+      async getDetail () {
+        console.log(Vue.localStorage.get('token'))
+        var jwt = Vue.localStorage.get('token')
+        if (jwt) {
+          Axios.get('http://localhost:3002/admin/employee/view/' + this.$route.params.id,
+            {
+              headers: {
+                'Authorization': 'bearer ' + Vue.localStorage.get('token')
+              }
+            })
+            .then(response => {
+              this.employees = response.data[0]
+              console.log(this.employees)
+            })
+            .catch(err => {
+              console.log(err)
+            })
+        } else {
+          this.$router.push('/admin/login')
+        }
+      },
+      edit: function () {
+        console.log(Vue.localStorage.get('token'))
+        var jwt = Vue.localStorage.get('token')
+        if (jwt) {
+          Axios.patch('http://localhost:3002/admin/employee/update/' + this.$route.params.id, {
+            employee_Id: this.employees.employee_Id,
+            employee_firstName: this.employees.employee_firstName,
+            employee_lastName: this.employees.employee_lastName,
+            employee_contact: this.employees.employee_contact,
+            employee_username: this.employees.employee_username,
+            employee_email: this.employees.employee_email
+          }, {
+            headers: {
+              'Authorization': 'bearer ' + Vue.localStorage.get('token')
+            }
           }).then(response => {
-            Vue.localStorage.set('token', response.data.token)
-            //  console.log(response.data.token)
-            localStorage.getItem('token')
-            // this.$router.push('/')
-            console.log('You have enterd the details successfully...' + response)
+            console.log('You have updated the details successfully...' + response)
+            window.alert('Data updated successfully...')
           }).catch(error => {
-            console.log('Error in adding employee details')
+            console.log('Error in updating employee details')
             console.log(error)
-            this.$router.push('/admin/employee/addEmployee')
+            // this.$router.push('/admin/employee/viewEmployee')
           })
         }
       },
       back () {
         this.$router.push('/admin/employee/viewEmployee')
       }
+    },
+    mounted () {
+      this.getDetail()
     }
   }
 </script>

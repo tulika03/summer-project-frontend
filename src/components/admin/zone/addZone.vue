@@ -17,7 +17,7 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary">Add</v-btn>
+                <v-btn color="primary" @click="addZone">Add</v-btn>
               </v-card-actions>
             </v-card>
           </v-flex>
@@ -29,8 +29,6 @@
 <script>
   import axios from 'axios'
   import Vue from 'vue'
-  import VueLocalStorage from 'vue-localstorage'
-  Vue.use(VueLocalStorage)
   export default {
     name: 'app',
     data () {
@@ -47,20 +45,31 @@
       }
     },
     methods: {
-      signup: function () {
-        console.log(this.zone_name)
-        axios.post('http: //', {
-          zone_name: this.zone_name
-        }).then(response => {
-          console.log(response.data)
-          console.log('Zone added successfully....')
-          localStorage.getItem('token')
-        }).catch(error => {
-          console.log('Error adding new zone')
-          console.log(error)
-          console.log(error.status)
-          console.log(error.code)
-        })
+      addZone: function () {
+        console.log('zone name: ' + this.zone_name)
+        console.log(Vue.localStorage.get('token'))
+        var jwt = Vue.localStorage.get('token')
+        if (jwt) {
+          axios.post('http://localhost:3002/admin/zone/addZone',
+            {
+              zone_name: this.zone_name
+            },
+            {
+              headers: {
+                'Authorization': 'bearer ' + Vue.localStorage.get('token')
+              }
+            })
+            .then(r => {
+              console.log(r + 'data inserted successfully')
+              window.alert('Data inserted successfully...')
+            })
+            .catch(error => {
+              console.log(error.response)
+            })
+        } else {
+          // this.$router.push('/admin/login')
+          console.log('authentication not successful...')
+        }
       }
     }
   }

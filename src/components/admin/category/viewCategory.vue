@@ -31,15 +31,21 @@
       hide-actions
       class="elevation-1"
     >
-
+      <template slot="headerCell" slot-scope="props">
+        <v-tooltip bottom>
+        <span slot="activator">
+          {{ props.header.text }}
+</span>
+        </v-tooltip>
+      </template>
       <template slot="items" slot-scope="props">
-        <td>{{ props.item.category_id }}</td>
-        <td>{{ props.item.category_title }}</td>
+        <td>{{props.item.category_id}}</td>
+        <td>{{ props.item.category_name}}</td>
         <td class="justify-left layout px-4">
-          <v-btn icon class="mx-0" v-bind:to= "{name: 'adminEditCategory'}">
+          <v-btn icon class="mx-0" v-bind:to="{name: 'adminEditCategory', params: {id: props.item._id }}">
             <v-icon color="teal">edit</v-icon>
           </v-btn>
-          <v-btn icon class="mx-0" @click="deleteItem(props.item)">
+          <v-btn icon class="mx-0" @click="deleteData(props.item._id)">
             <v-icon color="pink">delete</v-icon>
           </v-btn>
         </td>
@@ -47,10 +53,6 @@
       <v-alert slot="no-results" :value="true" color="error" icon="warning">
         Your search for "{{ search }}" found no results.
       </v-alert>
-
-      <template slot="pageText" slot-scope="{ pageStart, pageStop }">
-        From {{ pageStart }} to {{ pageStop }}
-      </template>
     </v-data-table>
         </v-card>
       </v-flex>
@@ -62,88 +64,65 @@
 
 
 <script>
+  import axios from 'axios'
+  import Vue from 'vue'
   export default {
-    data: () => ({
-      dialog: false,
-      search: '',
-      headers: [
-        {
-          text: 'Category Id', value: 'category_id'},
-        {text: 'Category Title', value: 'category_title'},
-        {text: 'Actions', value: 'category_id'}
-      ],
-      categories: [],
-      editedIndex: 0,
-      editedItem: {
-        category_id: '',
-        category_title: 0
-      },
-      defaultItem: {
-        category_id: '',
-        category_title: 0
-      }
-    }),
-
-    computed: {
-      formTitle () {
-        return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+    data () {
+      return {
+        dialog: false,
+        search: '',
+        headers: [
+          {text: 'Category Id', value: 'category_id'},
+          {text: 'Category name', value: 'category_name'},
+          {text: 'Action'}
+        ],
+        categories: [],
+        value: false,
+        _id: ''
       }
     },
-
-    watch: {
-      dialog (val) {
-        val || this.close()
-      }
-    },
-
     created () {
-      this.initialize()
-    },
-
-    methods: {
-      initialize () {
-        this.categories = [
-          {
-            category_title: 'Frozen Yogurt',
-            category_id: 159
-          },
-          {
-            category_title: 'Ice cream sandwich',
-            category_id: 237
-          },
-          {
-            category_title: 'Eclair',
-            category_id: 262
-          },
-          {
-            category_title: 'Cupcake',
-            category_id: 305
-          },
-          {
-            category_title: 'Gingerbread',
-            category_id: 356
-          },
-          {
-            category_title: 'Jelly bean',
-            category_id: 375
-          },
-          {
-            category_title: 'Lollipop',
-            category_id: 392
+      console.log(Vue.localStorage.get('token'))
+      var jwt = Vue.localStorage.get('token')
+      if (jwt) {
+        axios.get('http://localhost:3002/admin/category/viewCategory', {
+          headers: {
+            'Authorization': 'bearer ' + Vue.localStorage.get('token')
           }
-        ]
-      },
-
-      editItem (item) {
-        this.editedIndex = this.categories.indexOf(item)
-        this.editedItem = Object.assign({}, item)
-        this.dialog = true
-      },
-
-      deleteItem (item) {
-        const index = this.categories.indexOf(item)
-        confirm('Are you sure you want to delete this item?') && this.categories.splice(index, 1)
+        })
+          .then(response => {
+            this.categories = response.data
+          })
+          .catch(error => {
+            console.log(error)
+          })
+      } else {
+        this.$router.push('/admin/login')
       }
+    },
+    methods: {
+      deleteData: function (_id) {
+        console.log(Vue.localStorage.get('token'))
+        var jwt = Vue.localStorage.get('token')
+        if (jwt) {
+          axios.delete('http://localhost:3002/admin/category/delete/' + _id, {
+            headers: {
+              'Authorization': 'bearer ' + Vue.localStorage.get('token')
+            }
+          })
+            .then(res => {
+              console.log(res)
+             // window.alert('data deleted successfully...')
+              location.reload()
+            })
+            .catch(err => {
+              console.log(err)
+            })
+        } else {
+          this.$router.push('/admin/login')
+        }
+      }
+
     }
   }
 </script>

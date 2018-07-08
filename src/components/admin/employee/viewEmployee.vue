@@ -39,11 +39,12 @@
                 <td>{{ props.item.employee_contact }}</td>
                 <td>{{ props.item.employee_username }}</td>
                 <td>{{ props.item.employee_email }}</td>
+                <td><img :src="props.item.employee_photo" width="70px" height="90px" style="margin-top: 4px"></td>
                 <td class="justify-left layout px-4">
-                  <v-btn icon class="mx-0" v-bind:to= "{name: 'adminEditEmployee'}">
-                    <v-icon color="teal">edit</v-icon>
+                  <v-btn icon class="mx-0" v-bind:to="{name: 'adminEditEmployee', params: {id: props.item._id }}">
+                    <v-icon color="teal" >edit</v-icon>
                   </v-btn>
-                  <v-btn icon class="mx-0" @click="deleteItem(props.item)">
+                  <v-btn icon class="mx-0" @click="deleteData(props.item._id)">
                     <v-icon color="pink">delete</v-icon>
                   </v-btn>
                 </td>
@@ -66,90 +67,69 @@
 
 
 <script>
+  import axios from 'axios'
+  import Vue from 'vue'
   export default {
-    data: () => ({
-      dialog: false,
-      search: '',
-      headers: [
-        {
-          text: 'Employee  Id', value: 'employee_Id'},
-        {text: 'first Name', value: 'employee_firstName'},
-        {text: 'Last Name', value: 'employee_lastName'},
-        {text: 'Contact No.', value: 'employee_contact'},
-        {text: 'Username', value: 'employee_username'},
-        {text: 'Email id', value: 'employee_email'}
-      ],
-      employees: [],
-      editedIndex: 0,
-      editedItem: {
-        employee_Id: '',
-        employee_firstName: 0
-      },
-      defaultItem: {
-        employee_Id: '',
-        employee_firstName: 0
-      }
-    }),
-
-    computed: {
-      formTitle () {
-        return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+    data () {
+      return {
+        dialog: false,
+        search: '',
+        headers: [
+          {
+            text: 'Employee  Id', value: 'employee_Id'
+          },
+          {text: 'first Name', value: 'employee_firstName'},
+          {text: 'Last Name', value: 'employee_lastName'},
+          {text: 'Contact No.', value: 'employee_contact'},
+          {text: 'Username', value: 'employee_username'},
+          {text: 'Email id', value: 'employee_email'},
+          {text: 'Image', value: 'employee_photo'}
+        ],
+        employees: [],
+        _id: ''
       }
     },
-
-    watch: {
-      dialog (val) {
-        val || this.close()
-      }
-    },
-
     created () {
-      this.initialize()
+      console.log(Vue.localStorage.get('token'))
+      var jwt = Vue.localStorage.get('token')
+      if (jwt) {
+        axios.get('http://localhost:3002/admin/employee/view', {
+          headers: {
+            'Authorization': 'bearer ' + Vue.localStorage.get('token')
+          }
+        })
+          .then(response => {
+            this.employees = response.data
+          })
+          .catch(error => {
+            console.log(error)
+          })
+      } else {
+        this.$router.push('/admin/login')
+      }
     },
 
     methods: {
-      initialize () {
-        this.employees = [
-          {
-            employee_firstName: 'Frozen Yogurt',
-            employee_Id: 159
-          },
-          {
-            employee_firstName: 'Ice cream sandwich',
-            employee_Id: 237
-          },
-          {
-            employee_firstName: 'Eclair',
-            employee_Id: 262
-          },
-          {
-            employee_firstName: 'Cupcake',
-            employee_Id: 305
-          },
-          {
-            employee_firstName: 'Gingerbread',
-            employee_Id: 356
-          },
-          {
-            employee_firstName: 'Jelly bean',
-            employee_Id: 375
-          },
-          {
-            employee_firstName: 'Lollipop',
-            employee_Id: 392
-          }
-        ]
-      },
-
-      editItem (item) {
-        this.editedIndex = this.employees.indexOf(item)
-        this.editedItem = Object.assign({}, item)
-        this.dialog = true
-      },
-
-      deleteItem (item) {
-        const index = this.employees.indexOf(item)
-        confirm('Are you sure you want to delete this item?') && this.employees.splice(index, 1)
+      deleteData: function (_id) {
+        console.log(Vue.localStorage.get('token'))
+        var jwt = Vue.localStorage.get('token')
+        if (jwt) {
+          axios.delete('http://localhost:3002/admin/employee/delete/' + _id, {
+            headers: {
+              'Authorization': 'bearer ' + Vue.localStorage.get('token')
+            }
+          })
+            .then(res => {
+              console.log(res)
+              window.alert('data deleted successfully...')
+              location.reload()
+            })
+            .catch(err => {
+              console.log(err)
+            })
+        } else {
+          this.$router.push('/admin/login')
+        }
       }
     }
   }
