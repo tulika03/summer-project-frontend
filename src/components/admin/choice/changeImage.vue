@@ -8,7 +8,7 @@
           </v-toolbar>
           <v-card-media
             height="300px"
-            :src="items.imageURL">
+            :src="choices.choice_photo">
             <v-layout column class="media"
             contain>
               <v-card-title>
@@ -28,7 +28,7 @@
           </v-card-media>
           <v-card-actions>
             <v-btn @click="saveImage">save</v-btn>
-            <v-btn @click="back">back</v-btn>
+            <v-btn v-bind:to="{name: 'adminEditChoice', params: {id: this.choices._id }}">back</v-btn>
           </v-card-actions>
         </v-card>
       </v-flex>
@@ -37,36 +37,72 @@
 </template>
 
 <script>
+  import axios from 'axios'
+  import Vue from 'vue'
   export default {
     name: 'app',
     data () {
       return {
-        items: {
-          imageURL: ''
+        choices: {
+          choice_photo: '',
+          _id: ''
         },
         image: ''
       }
     },
-    created: function () {
-      this.items.imageURL = 'https://st.hzcdn.com/fimgs/be9128760584a324_7079-w603-h345-b0-p0--.jpg'
-    },
     methods: {
+      async getDetail () {
+        var jwt = Vue.localStorage.get('token')
+        if (jwt) {
+          axios.get('http://localhost:3002/admin/choice/viewChoice/' + this.$route.params.id,
+            {
+              headers: {
+                'Authorization': 'bearer ' + Vue.localStorage.get('token')
+              }
+            })
+            .then(response => {
+              this.choices = response.data[0]
+            })
+            .catch(err => {
+              console.log(err)
+            })
+        } else {
+          this.$router.push('/admin/login')
+        }
+      },
       onPickFile () {
         this.$refs.fileInput.click()
       },
       onFileSelected: function (event) {
         const file = event.target.files[0]
         this.image = file
-        this.items.imageURL = URL.createObjectURL(file)
+        this.choices.choice_photo = URL.createObjectURL(file)
       },
       saveImage () {
-        this.items.imageURL = this.image
-        console.log(this.items.imageURL.name)
-        location.reload()
-      },
-      back () {
-        this.$router.push('./editChoice')
+        this.choices.choice_photo = this.image
+        console.log(this.choices.choice_photo)
+        console.log(Vue.localStorage.get('token'))
+        var jwt = Vue.localStorage.get('token')
+        if (jwt) {
+          const fd = new FormData()
+          fd.append('choice_photo', this.choices.choice_photo)
+          axios.patch('http://localhost:3002/admin/choice/updateImage/' + this.$route.params.id, fd, {
+            headers: {
+              'Content-type': 'multipart/form-data',
+              'Authorization': 'bearer ' + Vue.localStorage.get('token')
+            }
+          }).then(r => {
+            console.log('r: ', JSON.stringify(r, null, 2))
+            location.reload()
+          })
+            .catch(error => {
+              console.log(error.response)
+            })
+        }
       }
+    },
+    mounted () {
+      this.getDetail()
     }
   }
 </script>

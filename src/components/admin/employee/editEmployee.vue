@@ -160,5 +160,6 @@
     mounted () {
       this.getDetail()
     }
+
   }
 </script>

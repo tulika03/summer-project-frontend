@@ -100,7 +100,7 @@ export default new Router({
       component: adminAddChoice
     },
     {
-      path: '/admin/choice/editChoice',
+      path: '/admin/choice/editChoice/:id',
       name: 'adminEditChoice',
       component: adminEditChoice
     },
@@ -110,7 +110,7 @@ export default new Router({
       component: adminViewChoice
     },
     {
-      path: '/admin/choice/changeImage',
+      path: '/admin/choice/changeImage/:id',
       name: 'adminChangeImage',
       component: adminChangeImage
     },

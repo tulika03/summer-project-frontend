@@ -25,7 +25,9 @@ import {
   VAvatar,
   VExpansionPanel,
   VTooltip,
-  VAlert
+  VAlert,
+  VCombobox,
+  VAutocomplete
 } from 'vuetify'
 import '../node_modules/vuetify/src/stylus/app.styl'
 
@@ -51,7 +53,9 @@ Vue.use(Vuetify, {
     VAvatar,
     VExpansionPanel,
     VTooltip,
-    VAlert
+    VAlert,
+    VCombobox,
+    VAutocomplete
   },
   theme: {
     primary: '#78e5c7',

@@ -33,12 +33,19 @@
             >
 
               <template slot="items" slot-scope="props">
-                <td>{{ props.item.zone_name }}</td>
+                <td>{{ props.item.choice_code }}</td>
+                <td>{{ props.item.choice_name }}</td>
+                <td><img :src="props.item.choice_photo" width="70px" height="90px" style="margin-top: 4px"></td>
+                <td>{{ props.item.choice_description }}</td>
+                <td> <a v-bind:href="props.item.choice_file" target="_blank" download>download</a></td>
+                <td>{{ props.item.choice_status }}</td>
+                <td>{{ props.item.choice_unitCost }}</td>
+
                 <td class="justify-left layout px-4">
-                  <v-btn icon class="mx-0" v-bind:to= "{name: 'adminEditZone'}">
+                  <v-btn icon class="mx-0" v-bind:to="{name: 'adminEditChoice', params: {id: props.item._id }}">
                     <v-icon color="teal">edit</v-icon>
                   </v-btn>
-                  <v-btn icon class="mx-0" @click="deleteItem(props.item)">
+                  <v-btn icon class="mx-0" @click="deleteData(props.item._id)">
                     <v-icon color="pink">delete</v-icon>
                   </v-btn>
                 </td>
@@ -61,6 +68,8 @@
 
 
 <script>
+  import axios from 'axios'
+  import Vue from 'vue'
   export default {
     data: () => ({
       dialog: false,
@@ -72,42 +81,67 @@
         {text: 'Description', value: 'choice_description'},
         {text: 'File ', value: 'choice_file'},
         {text: 'Status', value: 'choice_status'},
-        {text: 'Price', value: 'choice_unitCost'}
+        {text: 'Unit cost', value: 'choice_unitCost'}
       ],
-      zones: []
+      choices: [{
+        choice_code: '',
+        choice_name: '',
+        choice_photo: '',
+        choice_description: '',
+        choice_file: '',
+        choice_status: '',
+        choice_unitCost: '',
+        category: {
+          _id: '',
+          category_id: '',
+          category_name: ''
+        }
+
+      }],
+      _id: ''
     }),
     created () {
-      this.initialize()
-    },
-
-    methods: {
-      initialize () {
-        this.zones = [
-          {
-            choice_name: 'Frozen Yogurt'
-          },
-          {
-            choice_name: 'Ice cream sandwich'
-          },
-          {
-            choice_name: 'Eclair'
-          },
-          {
-            choice_name: 'Cupcake'
-          },
-          {
-            choice_name: 'Gingerbread'
-          },
-          {
-            choice_name: 'Jelly bean'
-          },
-          {
-            choice_name: 'Lollipop'
+      console.log(Vue.localStorage.get('token'))
+      var jwt = Vue.localStorage.get('token')
+      if (jwt) {
+        axios.get('http://localhost:3002/admin/choice/viewChoice', {
+          headers: {
+            'Authorization': 'bearer ' + Vue.localStorage.get('token')
           }
-        ]
-      },
-
-      deleteItem (item) {}
+        })
+          .then(response => {
+            this.choices = response.data
+            console.log(response.data)
+          })
+          .catch(error => {
+            console.log(error)
+          })
+      } else {
+        this.$router.push('/admin/login')
+      }
+    },
+    methods: {
+      deleteData: function (_id) {
+        console.log(Vue.localStorage.get('token'))
+        var jwt = Vue.localStorage.get('token')
+        if (jwt) {
+          axios.delete('http://localhost:3002/admin/choice/delete/' + _id, {
+            headers: {
+              'Authorization': 'bearer ' + Vue.localStorage.get('token')
+            }
+          })
+            .then(res => {
+              console.log(res)
+              window.alert('data deleted successfully...')
+              location.reload()
+            })
+            .catch(err => {
+              console.log(err)
+            })
+        } else {
+          this.$router.push('/admin/login')
+        }
+      }
     }
   }
 </script>

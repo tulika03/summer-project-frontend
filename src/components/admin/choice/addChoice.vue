@@ -28,7 +28,7 @@
                   <label style="color: grey">Upload Image*</label>    <br><br>
                   <div>
                     <input type=file
-                           @change="onFileSelected"
+                           @change="onImageSelected"
                            class="text--primary" required
                            :rules="[v => !!v || 'image is required']"
                            accept="image/*"
@@ -96,20 +96,33 @@
                     <v-flex xs6>
                       <v-select
                         :items="categories"
-                        v-model="categories"
-                        :hint="`${categories.category_title}, ${categories.categoryId}`"
+                        v-model="category_select"
+                        :hint="`${category_select.category_name}, ${category_select.category_id}`"
                         single-line
                         :rules="[v => !!v || 'category is required']"
-                        item-text="category_title"
+                        item-text="category_name"
                         item-value="category_id"
                         return-object
                         persistent-hint
                       ></v-select>
                     </v-flex>
                   </v-layout>
+                  <v-text-field name="choice_quantity"
+                                label="Quantity"
+                                v-model="choice_quantity"
+                                required
+                  >
+                  </v-text-field>
+                  <v-text-field name="choice_unitCost"
+                                label="Unit cost"
+                                v-model="choice_unitCost"
+                                required
+                  >
+                  </v-text-field>
                   <v-text-field name="choice_costCode"
                                 label="Cost Code"
                                 v-model="choice_costCode"
+                                required
                   >
                   </v-text-field>
 
@@ -118,7 +131,8 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn class="white--text indigo">Back</v-btn>
-                <v-btn class="white--text indigo">Add</v-btn>
+                <v-btn class="white--text indigo"
+                       @click="addChoice">Add</v-btn>
               </v-card-actions>
             </v-card>
           </v-flex>
@@ -173,8 +187,7 @@
           this.choice_name !== '' &&
           this.choice_photo !== '' &&
           this.choice_description !== '' &&
-          this.choice_unitCost !== '' &&
-          this.choice_status !== ''
+          this.choice_unitCost !== ''
       }
     },
     methods: {
@@ -191,16 +204,21 @@
         var jwt = Vue.localStorage.get('token')
         if (jwt) {
           const fd = new FormData()
+          console.log(this.choice_status)
+          console.log(this.category_select._id)
+          console.log(this.choice_photo)
+          console.log(this.choice_file)
           fd.append('choice_code', this.choice_code)
           fd.append('choice_name', this.choice_name)
           fd.append('choice_photo', this.choice_photo)
           fd.append('choice_company', this.choice_company)
           fd.append('choice_description', this.choice_description)
           fd.append('choice_file', this.choice_file)
-          fd.append('choice_status', this.choice_status)
+          fd.append('choice_status', this.choice_status.status_name)
           fd.append('choice_quantity', this.choice_quantity)
           fd.append('choice_unitCost', this.choice_unitCost)
           fd.append('choice_costCode', this.choice_costCode)
+          fd.append('categoryId', this.category_select._id)
           axios.post('http://localhost:3002/admin/choice/addChoice', fd,
             {
               headers: {
@@ -229,6 +247,8 @@
         })
           .then(response => {
             this.categories = response.data
+            console.log(this.categories)
+            console.log(this.status_list)
           })
           .catch(error => {
             console.log(error)
