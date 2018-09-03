@@ -27,6 +27,15 @@
                       required
                     ></v-text-field>
                   </v-flex>
+
+                  <v-text-field
+                    label="Item Allowance"
+                    v-model="item_allowence"
+                    name="item_allowence"
+                    required
+                    :rules="nameRules"
+                  ></v-text-field>
+
                   <v-flex xs12>
                     <label style="color: grey">Add choice file</label>
                     <br><br>
@@ -36,9 +45,11 @@
                                    class="text--primary"
                                    accept=""
                   ></v-flex>
+
+
                   <v-layout row wrap>
                     <v-flex xs2><br><br>
-                      <label style="color: grey">Category*</label>
+                      <label style="color: grey">Category</label>
                     </v-flex>
                     <v-flex xs6>
                       <v-select
@@ -47,7 +58,7 @@
                         :hint="`${category_select.category_title}, ${category_select.category_id}`"
                         single-line
                         :rules="[v => !!v || 'category is required']"
-                        item-text="category_title"
+                        item-text="category_name"
                         item-value="category_id"
                         return-object
                         persistent-hint
@@ -55,73 +66,83 @@
                     </v-flex>
                   </v-layout>
 
-                  <v-layout wrap>
-                    <v-flex xs12>
+                  <v-layout row wrap>
+                    <v-flex xs2><br><br>
+                      <label style="color: grey">Zone</label>
+                    </v-flex>
+                    <v-flex xs6>
                       <v-select
-                        v-model="select"
-                        :items="choices"
-                        label="Choices"
-                        chips
-                        tags
+                        :items="this.zone_ids"
+                        v-model="zone_select"
+                        single-line
+                        :rules="[v => !!v || 'Zone is required']"
+                        item-text="zone_name"
+                        item-value="_id"
+                        return-object
+                        persistent-hint
                       ></v-select>
-                        <template slot="selection" slot-scope="data">
-                          <v-chip
-                            :selected="data.selected"
-                            :disabled="data.disabled"
-                            :key="JSON.stringify(data.item)"
-                            class="chip--select-multi"
-                            @input="data.parent.selectItem(data.item)"
-                          >
-                            <v-avatar class="accent">{{ data.item.slice(0, 1).toUpperCase() }}</v-avatar>
-                            {{ data.item }}
-                          </v-chip>
-                        </template>
                     </v-flex>
                   </v-layout>
+
+                  <v-layout wrap>
+                  <v-flex xs8>
+                    <v-autocomplete
+                      v-model="select"
+                      :items="choices"                      
+                      chips                      
+                      label="Choices"
+                      item-text="choice_name"
+                      item-value="_id"
+                      multiple
+                    >
+                      <template
+                        slot="selection"
+                        slot-scope="data"
+                      >
+                        <v-chip
+                          :selected="data.selected"
+                          close
+                          class="chip--select-multi"
+                          @input="data.parent.selectItem(data.item)"
+                        >
+                          <v-avatar>
+                            <img :src="data.item.choice_file">
+                          </v-avatar>
+                          {{ data.item.choice_name }}                          
+                        </v-chip>
+                      </template>
+                      <template
+                        slot="item"
+                        slot-scope="data"
+                      >
+                        <template v-if="typeof data.item !== 'object'">
+                          <v-list-tile-content v-text="data.item"></v-list-tile-content>
+                        </template>
+                        <template v-else>
+                          <v-list-tile-avatar>
+                            <img :src="data.item.choice_photo">
+                          </v-list-tile-avatar>
+                          <v-list-tile-content>
+                            <v-list-tile-title v-html="data.item.choice_name"></v-list-tile-title>
+                             <v-list-tile-sub-title v-html="data.item.category.category_name"></v-list-tile-sub-title>
+                            <v-list-tile-sub-title v-html="data.item.category_name"></v-list-tile-sub-title>                            
+                          </v-list-tile-content>
+                        </template>
+                      </template>
+                    </v-autocomplete>
+                  </v-flex>
+                </v-layout>
 
                 </v-form>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn class="white--text indigo">Back</v-btn>
-                <v-btn class="white--text indigo">Add to table</v-btn>
+                
+                <v-btn class="white--text indigo" @click="addItem">Add Item</v-btn>
               </v-card-actions>
             </v-card>
 
-            <v-container fluid="true">
-              <v-card>
-                <v-card-text>
-                  <v-data-table
-                    :headers="headers"
-                    :items="items_detail"
-                    class="elevation-1"
-                  >
-                    <template slot="items" slot-scope="props">
-                      <td>{{ props.item.item_name }}</td>
-                      <td>{{ props.item.item_description }}</td>
-                      <td>{{ props.item.item_file }}</td>
-                      <td>{{ props.item.item_category }}</td>
-                      <td>{{ props.item.item_choices }}</td>
-                      <td>
-                        <v-btn icon class="mx-0" @click="editItem(props.item)">
-                          <v-icon color="teal">edit</v-icon>
-                        </v-btn>
-                        <v-btn icon class="mx-0" @click="deleteItem(props.item)">
-                          <v-icon color="pink">delete</v-icon>
-                        </v-btn>
-                      </td>
-                    </template>
-                  </v-data-table>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn class="white--text indigo">
-                    Save
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
 
-              </v-container>
 
           </v-flex>
         </v-layout>
@@ -138,15 +159,15 @@
   export default {
     name: 'app',
     data () {
-      return {
+      return { 
+        jobsite:'5b8680e47cabc71fa0079d1d',
+        fetchedJobsite:[],
+        item_ids:[],  
+        zone_ids:[],  
+        zone_select:'',           
         category_select: '',
         select: [],
-        choices: [
-          'Programming',
-          'Design',
-          'Vue',
-          'Vuetify'
-        ],
+        choices: [],
         item_title: '',
         nameRules: [
           v => !!v || 'name is required',
@@ -160,12 +181,7 @@
           {status_name: 'Pending'},
           {status_name: 'Complete'}
         ],
-        category: [
-          {category_title: 'aaa', category_id: '1'},
-          {category_title: 'bbb', category_id: '2'},
-          {category_title: 'ccc', category_id: '3'},
-          {category_title: 'ddd', category_id: '4'}
-        ],
+        category: [],
         sideNav: false,
         right: null,
         dialog: false,
@@ -181,48 +197,132 @@
           { text: 'Choice', value: 'item_choice' },
           { text: 'Action' }
         ],
-        items_detail: [
-          {
-            item_name: 'item 1'
-          },
-          {
-            item_name: 'item 2'
-          }
+        items_detail: [          
         ]
+      }
+    },
+    computed: {
+      formIsValid () {
+        return this.item_title !== '' &&
+          this.item_description !== '' &&
+          this.item_file !== '' &&
+          this.item_allowence !== '' &&
+          this.select !== '' &&
+          this.choices !== ''
       }
     },
     methods: {
       onFileSelected (event) {
-        this.choice_file = event.target.files[0]
+        this.item_file = event.target.files[0]
         console.log(this.item_file)
       },
-      addChoice () {
+      addItem () {
+        //add item into item table
         console.log(Vue.localStorage.get('token'))
         var jwt = Vue.localStorage.get('token')
         if (jwt) {
-          const fd = new FormData()
-          fd.append('choice_code', this.item_title)
-          fd.append('choice_name', this.item_description)
-          fd.append('choice_photo', this.item_file)
-          fd.append('choice_company', this.item_allowence)
-          fd.append('choice_description', this.category)
-          fd.append('choice_file', this.choices)
-          axios.post('http://localhost:3002/admin/choice/addChoice', fd,
+          const fd = new FormData()          
+          fd.append('item_title', this.item_title)
+          fd.append('item_description', this.item_description)
+          fd.append('item_file', this.item_file)
+          fd.append('item_allowence', this.item_allowence)
+          fd.append('item_categoryId', this.category_select._id)
+          fd.append('choiceId', this.select)
+          fd.append('item_jobsite',this.jobsite)
+          fd.append('item_zone',this.zone_select)
+          axios.post('http://localhost:3002/item/addItem', fd,
             {
               headers: {
                 'Content-type': 'multipart/form-data',
                 'Authorization': 'bearer ' + Vue.localStorage.get('token')
               }
             })
-            .then(r => console.log('r: ', JSON.stringify(r, null, 2)))
+            .then(r => {
+              console.log('r: ', JSON.stringify(r, null, 2)) 
+              this.items_detail.push(this.item_title)
+              })
             .catch(error => {
               console.log(error.response)
             })
-          window.alert('data inserted successfully.')
+          //window.alert('data inserted successfully.')
         } else {
-          this.$router.push('/admin/')
+          this.$router.push('/employee/employeeLogin')
         }
+      },
+      async getCategory () {
+        console.log('Category detail')        
+        var jwt = localStorage.getItem('token')
+        if (jwt) {
+          axios.get('http://localhost:3002/admin/category/viewCategory', {
+            headers: {
+              'Authorization': 'bearer ' + Vue.localStorage.get('token')
+            }
+          })
+            .then(response => {                
+              this.category = response.data          
+              console.log(this.category)
+            })
+            .catch(error => {
+              console.log(error)
+            })
+        } else {
+          this.$router.push('/employee/employeeLogin')
+        }
+      },
+      getZone () {
+        console.log('Zone detail')                
+        var jwt = localStorage.getItem('token')
+        if (jwt) {
+        //jobsite:'5b8680e47cabc71fa0079d1d',
+          axios.get('http://localhost:3002/admin/jobsite/viewJobsite/5b8680e47cabc71fa0079d1d', {
+            headers: {
+              'Authorization': 'bearer ' + Vue.localStorage.get('token')
+            }
+          })
+            .then(response => { 
+              this.fetchedJobsite = response.data
+              for(let i=0;i<this.fetchedJobsite.job_zone.length;i++){
+                this.zone_ids[i]=this.fetchedJobsite.job_zone[i]
+              }       
+              console.log("zone details:") 
+              //console.log(response.data[0])
+              //console.log(response.data.job_zone)
+              console.log(this.zone_ids)                  
+            })
+            .catch(error => {
+              console.log(error)
+            })
+        } else {
+          this.$router.push('/employee/employeeLogin')
+        }
+      },
+      getChoice () {
+        console.log('Choice detail')                
+        var jwt = localStorage.getItem('token')
+        if (jwt) {
+          axios.get('http://localhost:3002/admin/choice/viewChoice', {
+            headers: {
+              'Authorization': 'bearer ' + Vue.localStorage.get('token')
+            }
+          })
+            .then(response => {                
+              this.choices = response.data          
+              console.log(this.choices)                   
+            })
+            .catch(error => {
+              console.log(error)
+            })
+        } else {
+          this.$router.push('/employee/employeeLogin')
+        }
+      },
+      addTable() {
       }
-    }
+    },
+    mounted () {
+        this.getCategory(),
+        this.getChoice(),
+        this.getZone()        
+    }  
   }
 </script>

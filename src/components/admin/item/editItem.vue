@@ -42,6 +42,15 @@
                         required
                       ></v-text-field>
                     </v-flex>
+
+                    <v-text-field
+                      label="Item Allowance"
+                      v-model="item_allowence"
+                      name="item_allowence"
+                      required
+                      :rules="nameRules"
+                    ></v-text-field>
+
                     <v-layout row wrap>
                       <v-flex xs2><br><br>
                         <label style="color: grey">Category*</label>
@@ -60,6 +69,24 @@
                         ></v-select>
                       </v-flex>
                     </v-layout>
+
+                    <v-layout row wrap>
+                    <v-flex xs2><br><br>
+                      <label style="color: grey">Zone</label>
+                    </v-flex>
+                    <v-flex xs6>
+                      <v-select
+                        :items="item_zone"
+                        v-model="item_zone"
+                        single-line
+                        :rules="[v => !!v || 'Zone is required']"
+                        item-text="zone_name"
+                        item-value="_id"
+                        return-object
+                        persistent-hint
+                      ></v-select>
+                    </v-flex>
+                  </v-layout>
 
                     <v-layout wrap>
                       <v-flex xs12>
@@ -127,7 +154,6 @@
 <script>
   import axios from 'axios'
   import Vue from 'vue'
-
   export default {
     name: 'app',
     data () {
@@ -143,107 +169,143 @@
           v => v.length <= 50 || 'Name must be less than 51 characters'
         ],
         items: {
-          choice_code: '',
-          choice_name: '',
-          choice_photo: '',
-          choice_length: '',
-          choice_company: '',
-          faculty_password: '',
-          choice_description: '',
-          choice_file: 'E:/file1.pdf',
-          choice_status: '',
-          choice_quantity: '',
-          choice_unitCost: '',
-          choice_costCode: '',
-          category_id: '',
-          category: [
-            {category_title: 'aaa', category_id: '1'},
-            {category_title: 'bbb', category_id: '2'},
-            {category_title: 'ccc', category_id: '3'},
-            {category_title: 'ddd', category_id: '4'}
-          ]
+          item_title: '',
+          item_description: '',
+          item_file: '',
+          item_allowence: '',
+          category: '',
+          choices: '',
+          item_zone: ''
         },
-        status_list: [
-          {status_name: 'Pending'},
-          {status_name: 'Complete'}
-        ],
+        zone_ids:[],
+        
         sideNav: false,
         right: null
       }
     },
     computed: {
       formIsValid () {
-        return this.choice_code !== '' &&
-          this.choice_name !== '' &&
-          this.choice_photo !== '' &&
-          this.choice_description !== '' &&
-          this.choice_unitCost !== '' &&
-          this.choice_status !== ''
+        return this.item_title !== '' &&
+          this.item_description !== '' &&
+          this.item_file !== '' &&
+          this.item_allowence !== '' &&
+          this.category !== '' &&
+          this.choices !== '' &&
+           this.item_zone !== ''
       }
     },
     methods: {
-      onImageSelected (event) {
-        this.$router.push('./changeImage')
-      },
-      onPickFile () {
-        this.$refs.fileInput.click()
-      },
-      onFileSelected (event) {
-        this.items.choice_file = event.target.files[0]
-        console.log(this.items.choice_file)
-      },
-      addChoice () {
-        console.log(Vue.localStorage.get('token'))
+      async getDetail () {
         var jwt = Vue.localStorage.get('token')
         if (jwt) {
-          const fd = new FormData()
-          fd.append('choice_code', this.choice_code)
-          fd.append('choice_name', this.choice_name)
-          fd.append('choice_company', this.choice_company)
-          fd.append('choice_description', this.choice_description)
-          fd.append('choice_status', this.choice_status)
-          fd.append('choice_quantity', this.choice_quantity)
-          fd.append('choice_unitCost', this.choice_unitCost)
-          fd.append('choice_costCode', this.choice_costCode)
-          axios.patch('http://localhost:3002/admin/choice/Choice', fd,
+          axios.get('http://localhost:3002/admin/item/viewItem/' + this.$route.params.id,
             {
               headers: {
-                'Content-type': 'multipart/form-data',
                 'Authorization': 'bearer ' + Vue.localStorage.get('token')
               }
             })
-            .then(r => console.log('r: ', JSON.stringify(r, null, 2)))
+            .then(response => {
+              this.items = response.data[0]
+              //this.status.choice_status = this.choices.choice_status
+              //this.status_select = this.status
+              //console.log(this.status_select)
+              this.category_select = this.items.category
+              console.log(this.category_select)
+            })
+            .catch(err => {
+              console.log(err)
+            })
+        } else {
+          this.$router.push('/admin/login')
+        }
+      },
+      onFileSelected (event) {
+        this.items.item_file = event.target.files[0]
+        console.log(this.items.item_file)
+        console.log('file check')
+      },
+      getZone () {
+        console.log('Zone detail')                
+        var jwt = localStorage.getItem('token')
+        if (jwt) {
+        //jobsite:'5b8680e47cabc71fa0079d1d',
+          axios.get('http://localhost:3002/admin/jobsite/viewJobsite/5b8680e47cabc71fa0079d1d', {
+            headers: {
+              'Authorization': 'bearer ' + Vue.localStorage.get('token')
+            }
+          })
+            .then(response => { 
+              this.fetchedJobsite = response.data
+              for(let i=0;i<this.fetchedJobsite.job_zone.length;i++){
+                this.zone_ids[i]=this.fetchedJobsite.job_zone[i]
+              }       
+              console.log("zone details:") 
+              //console.log(response.data[0])
+              //console.log(response.data.job_zone)
+              console.log(this.zone_ids)                  
+            })
+            .catch(error => {
+              console.log(error)
+            })
+        } else {
+          this.$router.push('/employee/employeeLogin')
+        }
+      },
+      updateItems () {
+        console.log(Vue.localStorage.get('token'))
+        var jwt = Vue.localStorage.get('token')
+        if (jwt) {
+          console.log(this.status_select.choice_status)
+          console.log(this.category_select._id)
+          axios.patch('http://localhost:3002/admin/item/updateItem/' + this.$route.params.id, {
+            item_title: this.items.item_title,
+            item_description: this.items.item_description,
+            item_allowence: this.items.item_allowence,
+            category: this.items.category,
+            choices: this.items.choices,
+            item_zone: this.items.item_zone
+          }, {
+            headers: {
+              'Authorization': 'bearer ' + Vue.localStorage.get('token')
+            }
+          })
+            .then(r => console.log('r: ', JSON.stringify(r, null, 2)),
+                         window.alert('data inserted successfully.')
+              )
             .catch(error => {
               console.log(error.response)
             })
-          window.alert('data inserted successfully.')
         } else {
           this.$router.push('/admin/')
         }
       },
-      postFile () {
-        const fd = new FormData()
+      saveFile () {
+        console.log(this.choices.choice_file)
+        console.log(Vue.localStorage.get('token'))
         var jwt = Vue.localStorage.get('token')
-        console.log(this.$route.params.id)
-        console.log(this.items.choice_file)
-        console.log('view id called' + jwt)
         if (jwt) {
-          fd.append('choice_file', this.items.choice_file)
-          axios.post('http://' + this.$route.params.id, fd,
-            {
-              headers: {
-                'Content-type': 'multipart/form-data',
-                'Authorization': 'bearer ' + Vue.localStorage.get('token')
-              }
-            })
-            .then(r => console.log('r: ', JSON.stringify(r, null, 2)))
+          const fd = new FormData()
+          //console.log(this.choices.choice_file)
+          fd.append('item_file', this.items.item_file)
+          axios.patch('http://localhost:3002/admin/item/updateFile/' + this.$route.params.id, fd, {
+            headers: {
+              'Content-type': 'multipart/form-data',
+              'Authorization': 'bearer ' + Vue.localStorage.get('token')
+            }
+          }).then(r => {
+            console.log('r: ', JSON.stringify(r, null, 2))
+            window.alert('File saved successfully...')
+            location.reload()
+          })
             .catch(error => {
               console.log(error.response)
             })
-        } else {
-          this.$router.push('/student/login')
         }
       }
+    },
+    mounted () {
+      this.getDetail(),
+      this.getZone()
     }
   }
 </script>
